@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact & Gallery</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #eef2f5;
+    }
+
+    header, footer {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    .sidebar {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #003366;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      color: #005bb5;
+      text-decoration: underline;
+    }
+
+    .form-container, .gallery-container {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+      margin-top: 1rem;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .upload-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      margin-top: 1rem;
+    }
+
+    .upload-section input[type="text"],
+    .upload-section input[type="file"] {
+      flex: 1;
+    }
+
+    button {
+      padding: 10px 15px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #004b99;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .gallery img {
+      width: 100px;
+      height: 120px;
+      object-fit: contain;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      background: white;
+      padding: 5px;
+      transition: transform 0.2s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      border-color: #0066cc;
+      box-shadow: 3px 3px 8px rgba(0, 102, 204, 0.6);
+    }
+
+    .image-wrapper {
+      position: relative;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 0, 0, 0.85);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 28px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .delete-btn:hover {
+      background: red;
+    }
+
+    .toggle-btn {
+      margin-top: 1rem;
+      background: #008080;
+    }
+
+    #savedData button {
+      background: darkred;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Contact & Image Gallery</h1>
+</header>
+
+<main class="grid-container">
+  <aside class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+      <li><a href="#contact">Contact Form</a></li>
+      <li><a href="#gallery">Image Gallery</a></li>
+    </ul>
+  </aside>
+
+  <section>
+    <!-- Contact Form -->
+    <div id="contact" class="form-container">
+      <h2>Contact Us</h2>
+      <form id="contactForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required style="width: 100%;">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required style="width: 100%;">
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="4" required style="width: 100%;"></textarea>
+
+        <button type="submit">Submit</button>
+      </form>
+
+      <div id="savedData" style="margin-top: 1rem; display: none;">
+        <h3>Previously Submitted Info:</h3>
+        <p><strong>Name:</strong> <span id="savedName"></span></p>
+        <p><strong>Email:</strong> <span id="savedEmail"></span></p>
+        <p><strong>Message:</strong> <span id="savedMessage"></span></p>
+        <button onclick="clearData()">Clear All Data</button>
+      </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div id="gallery" class="gallery-container">
+      <h2>Image Gallery</h2>
+
+      <div class="upload-section">
+        <input type="text" id="imgUrl" placeholder="Image URL" />
+        <input type="file" id="imgFile" accept="image/*" />
+        <button onclick="addImage()">Add</button>
+      </div>
+
+      <button class="toggle-btn" onclick="toggleGallery()">Toggle Saved Images</button>
+      <div class="gallery" id="galleryGrid" style="display: none;"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; Web development using HTML, CSS and JS (Task 2)</p>
+</footer>
+
+<script>
+  const form = document.getElementById("contactForm");
+  const galleryGrid = document.getElementById("galleryGrid");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+
+    if (!name || !email || !message) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    const contactData = { name, email, message };
+    localStorage.setItem("contactInfo", JSON.stringify(contactData));
+
+    alert("Form submitted successfully!");
+    displaySavedContact();
+    form.reset();
+  });
+
+  function displaySavedContact() {
+    const data = JSON.parse(localStorage.getItem("contactInfo"));
+    if (data) {
+      document.getElementById("savedData").style.display = "block";
+      document.getElementById("savedName").textContent = data.name;
+      document.getElementById("savedEmail").textContent = data.email;
+      document.getElementById("savedMessage").textContent = data.message;
+    }
+  }
+
+  function addImage() {
+    const urlInput = document.getElementById("imgUrl");
+    const fileInput = document.getElementById("imgFile");
+
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        saveImage(e.target.result);
+        renderGallery();
+      };
+      reader.readAsDataURL(file);
+    } else if (urlInput.value.trim() !== "") {
+      saveImage(urlInput.value.trim());
+      renderGallery();
+    } else {
+      alert("Please select a file or enter an image URL.");
+    }
+
+    urlInput.value = "";
+    fileInput.value = "";
+  }
+
+  function saveImage(src) {
+    const images = JSON.parse(localStorage.getItem("imageGallery")) || [];
+    images.push(src);
+    localStorage.setItem("imageGallery", JSON.stringify(images));
+  }
+
+  function renderGallery() {
+    const images = JSON.parse(localStorage.getItem("imageGallery")) || [];
+    galleryGrid.innerHTML = "";
+    images.forEach((src, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "image-wrapper";
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = "Uploaded Image";
+      img.title = "Click to open full image";
+      img.onclick = () => {
+        window.open(src, '_blank');
+      };
+
+      const btn = document.createElement("button");
+      btn.className = "delete-btn";
+      btn.innerHTML = "×";
+      btn.onclick = () => {
+        deleteImage(index);
+      };
+
+      wrapper.appendChild(img);
+      wrapper.appendChild(btn);
+      galleryGrid.appendChild(wrapper);
+    });
+  }
+
+  function deleteImage(index) {
+    const images = JSON.parse(localStorage.getItem("imageGallery")) || [];
+    images.splice(index, 1);
+    localStorage.setItem("imageGallery", JSON.stringify(images));
+    renderGallery();
+  }
+
+  function toggleGallery() {
+    galleryGrid.style.display =
+      galleryGrid.style.display === "none" ? "grid" : "none";
+  }
+
+  function clearData() {
+    localStorage.removeItem("contactInfo");
+    localStorage.removeItem("imageGallery");
+    document.getElementById("savedData").style.display = "none";
+    galleryGrid.innerHTML = "";
+    galleryGrid.style.display = "none";
+    alert("All saved data has been cleared.");
+  }
+
+  // Load on page start
+  window.onload = function () {
+    displaySavedContact();
+    renderGallery();
+  };
+</script>
+</body>
+</html>
