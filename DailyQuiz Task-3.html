@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Smart Quiz with Weather</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .main-container {
+      width: 95%;
+      max-width: 700px;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      overflow-y: auto;
+      max-height: 95vh;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #quiz-date {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .quiz-box, .result-box {
+      text-align: center;
+    }
+    .hidden {
+      display: none;
+    }
+    .options-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .options-list li {
+      background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .options-list li:hover {
+      transform: scale(1.05);
+    }
+    .quote-bar {
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 15px;
+    }
+    #daily-quote {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll-left 15s linear infinite;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: black;
+    }
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    #weather {
+      margin-top: 20px;
+      padding: 10px;
+      background: #e0f7fa;
+      border-radius: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <header>
+      <h1>🌟 Daily Smart Quiz 🌟</h1>
+      <input type="date" id="quiz-date" />
+    </header>
+
+    <div class="quote-bar">
+      <p id="daily-quote"></p>
+    </div>
+    <div id="quiz-box" class="quiz-box">
+      <h2 id="question-number"></h2>
+      <p id="question-text"></p>
+      <ul id="options" class="options-list"></ul>
+      <button id="next-btn">Next</button>
+    </div>
+
+    <div id="result-box" class="result-box hidden">
+      <h2>🎉 Quiz Complete!</h2>
+      <p id="score-text"></p>
+      <p id="feedback-text"></p>
+      <button onclick="restartQuiz()">Try Another Day</button>
+    </div>
+
+    <div id="weather">
+      <p><strong>🌦 Weather Info:</strong></p>
+      <input type="text" id="city-input" placeholder="Enter city" />
+      <button onclick="getWeather()">Get Weather</button>
+      <p id="weather-result"></p>
+    </div>
+
+  </div>
+
+  <script>
+    const quizData = {};
+    const questionPool = {
+      arithmetic: [
+        { question: "What is 5 + 7?", options: ["10", "12", "13", "14"], answer: "12" },
+        { question: "What is 9 × 3?", options: ["27", "26", "30", "24"], answer: "27" },
+        { question: "What is 100 ÷ 4?", options: ["20", "25", "30", "35"], answer: "25" },
+        { question: "What is 15 − 6?", options: ["9", "10", "11", "8"], answer: "9" }
+      ],
+      reasoning: [
+        { question: "Which comes next: 1, 4, 9, 16, ?", options: ["20", "25", "24", "30"], answer: "25" },
+        { question: "Odd one out: Dog, Cat, Cow, Car", options: ["Dog", "Cat", "Cow", "Car"], answer: "Car" },
+        { question: "What comes next: A, C, E, G, ?", options: ["H", "I", "J", "K"], answer: "I" },
+        { question: "Which shape has 3 sides?", options: ["Circle", "Square", "Triangle", "Pentagon"], answer: "Triangle" }
+      ],
+      english: [
+        { question: "Synonym of 'Brave'", options: ["Coward", "Heroic", "Scared", "Mean"], answer: "Heroic" },
+        { question: "Choose correct spelling", options: ["Definately", "Definitely", "Definitly", "Defenetely"], answer: "Definitely" },
+        { question: "Antonym of 'Kind'", options: ["Gentle", "Cruel", "Nice", "Helpful"], answer: "Cruel" },
+        { question: "Fill in the blank: I ___ to school every day.", options: ["go", "goes", "went", "going"], answer: "go" }
+      ],
+      gk: [
+        { question: "Largest continent?", options: ["Africa", "Asia", "Europe", "Australia"], answer: "Asia" },
+        { question: "Currency of Japan?", options: ["Yen", "Dollar", "Won", "Euro"], answer: "Yen" },
+        { question: "National animal of India?", options: ["Elephant", "Lion", "Tiger", "Panther"], answer: "Tiger" },
+        { question: "Which is a prime number?", options: ["4", "6", "9", "7"], answer: "7" }
+      ],
+      coding: [
+        { question: "HTML is used for?", options: ["Styling", "Structure", "Logic", "Security"], answer: "Structure" },
+        { question: "Which is a JavaScript framework?", options: ["React", "Laravel", "Django", "Flask"], answer: "React" },
+        { question: "What does CSS do?", options: ["Add logic", "Style pages", "Store data", "Send requests"], answer: "Style pages" },
+        { question: "Which tag is used for heading in HTML?", options: ["<head>", "<h1>", "<p>", "<title>"], answer: "<h1>" }
+      ]
+    };
+
+    function getRandomQuestions(category, count) {
+      const pool = [...questionPool[category]];
+      const selected = [];
+      for (let i = 0; i < count; i++) {
+        const randIndex = Math.floor(Math.random() * pool.length);
+        selected.push(pool.splice(randIndex, 1)[0]);
+      }
+      return selected;
+    }
+
+    function generateQuizForDate(dateStr) {
+      return [
+        ...getRandomQuestions("arithmetic", 2),
+        ...getRandomQuestions("reasoning", 2),
+        ...getRandomQuestions("english", 2),
+        ...getRandomQuestions("gk", 2),
+        ...getRandomQuestions("coding", 2)
+      ];
+    }
+
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toISOString().split("T")[0];
+      quizData[dateKey] = generateQuizForDate(dateKey);
+    }
+
+    const dateInput = document.getElementById("quiz-date");
+    const quizBox = document.getElementById("quiz-box");
+    const questionNumber = document.getElementById("question-number");
+    const questionText = document.getElementById("question-text");
+    const optionsList = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultBox = document.getElementById("result-box");
+    const scoreText = document.getElementById("score-text");
+    const feedbackText = document.getElementById("feedback-text");
+
+    let currentDate = new Date().toISOString().split("T")[0];
+    let currentQuiz = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    dateInput.max = currentDate;
+
+    dateInput.addEventListener("change", () => {
+      const selected = dateInput.value;
+      const selectedDate = new Date(selected);
+      const diffDays = (new Date() - selectedDate) / (1000 * 60 * 60 * 24);
+      if (diffDays > 7) {
+        alert("⛔ You can only access quizzes from the past 7 days.");
+        dateInput.value = currentDate;
+        return;
+      }
+      if (!quizData[selected]) {
+        quizData[selected] = generateQuizForDate(selected);
+      }
+      startQuiz(selected);
+    });
+
+    function startQuiz(dateKey) {
+      currentQuiz = quizData[dateKey];
+      currentQuestionIndex = 0;
+      score = 0;
+      resultBox.classList.add("hidden");
+      quizBox.classList.remove("hidden");
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = currentQuiz[currentQuestionIndex];
+      questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuiz.length}`;
+      questionText.textContent = q.question;
+      optionsList.innerHTML = "";
+      q.options.forEach(option => {
+        const li = document.createElement("li");
+        li.textContent = option;
+        li.onclick = () => selectAnswer(option, q.answer);
+        optionsList.appendChild(li);
+      });
+    }
+
+    function selectAnswer(selected, correct) {
+      const allOptions = optionsList.querySelectorAll("li");
+      allOptions.forEach(opt => opt.style.pointerEvents = "none");
+      if (selected === correct) score++;
+      setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuiz.length) {
+          showQuestion();
+        } else {
+          showResult();
+        }
+      }, 500);
+    }
+
+    function showResult() {
+      quizBox.classList.add("hidden");
+      resultBox.classList.remove("hidden");
+      scoreText.textContent = `Your Score: ${score} / ${currentQuiz.length}`;
+      if (score >= 9) feedbackText.textContent = "🏆 Excellent! You're a quiz master!";
+      else if (score >= 7) feedbackText.textContent = "🎉 Great job! Keep practicing!";
+      else if (score >= 5) feedbackText.textContent = "🙂 Not bad! You can do even better.";
+      else feedbackText.textContent = "💡 Keep learning and come back stronger!";
+    }
+
+    function restartQuiz() {
+      resultBox.classList.add("hidden");
+      dateInput.value = currentDate;
+      startQuiz(currentDate);
+    }
+
+    function getWeather() {
+      const city = document.getElementById("city-input").value;
+      const result = document.getElementById("weather-result");
+      if (!city) {
+        result.textContent = "Please enter a city.";
+        return;
+      }
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=cff3d69105dff17c3581bfa9ff12c997
+&units=metric`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.cod === 200) {
+            result.textContent = `🌡 ${data.main.temp}°C, ${data.weather[0].description}`;
+          } else {
+            result.textContent = "City not found.";
+          }
+        })
+        .catch(() => result.textContent = "Failed to fetch weather data.");
+    }
+
+    window.onload = () => {
+      dateInput.value = currentDate;
+      if (quizData[currentDate]) {
+        startQuiz(currentDate);
+      }
+
+      const quotes = [
+        "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+        "Believe in yourself and all that you are.",
+        "Hard work beats talent when talent doesn’t work hard.",
+        "Every accomplishment starts with the decision to try.",
+        "The secret of success is to do the common thing uncommonly well.",
+        "Push yourself, because no one else is going to do it for you.",
+        "Don't watch the clock; do what it does. Keep going."
+      ];
+
+      const quoteElement = document.getElementById("daily-quote");
+      const todayIndex = new Date().getDate() % quotes.length;
+      quoteElement.textContent = quotes[todayIndex];
+    };
+  </script>
+</body>
+</html>
