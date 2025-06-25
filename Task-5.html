@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Tech Blog - Your Modern Blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #a78bfa;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8b5cf6;
+    }
+    @keyframes fadeInScaleUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .animate-fade-in-up {
+      animation: fadeInScaleUp 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Global Message Display -->
+  <div id="global-message" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 p-4 rounded-lg shadow-lg text-white font-semibold transition-all duration-300 ease-in-out transform opacity-0 scale-95" style="display: none;"></div>
+
+  <!-- Navbar -->
+  <nav class="bg-violet-700 p-4 shadow-xl sticky top-0 z-40">
+    <div class="container mx-auto flex justify-between items-center">
+      <div id="brand-logo" class="text-white text-3xl font-extrabold cursor-pointer hover:text-violet-200 transition-colors duration-300">The Tech Blog</div>
+      <div class="flex items-center space-x-6">
+        <button id="nav-home" class="text-white hover:text-violet-200 px-3 py-2 rounded-md text-lg font-medium transition-colors duration-300">Home</button>
+        <button id="nav-blog" class="text-white hover:text-violet-200 px-3 py-2 rounded-md text-lg font-medium transition-colors duration-300">Blog</button>
+        <button id="nav-about" class="text-white hover:text-violet-200 px-3 py-2 rounded-md text-lg font-medium transition-colors duration-300">About</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="app-content" class="container mx-auto p-6 flex-grow"></main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 text-center p-6 mt-12 shadow-inner">
+    <div class="container mx-auto">
+      <p>&copy; <span id="current-year"></span> The Tech Blog. All rights reserved. | Built with ❤ HTML, CSS, & JavaScript</p>
+    </div>
+  </footer>
+
+  <script>
+    const blogPosts = [
+      {
+        id: 11,
+        title: 'HTML Semantics',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'Semantic HTML uses tags that clearly describe their meaning, improving SEO and accessibility.',
+        content: `<p><strong>Explanation:</strong> HTML is the standard markup language for creating web pages. Semantic HTML uses tags that clearly describe their meaning.</p><p><strong>Uses:</strong> Structuring web content, improving accessibility, SEO optimization.</p><h3>Basic Program:</h3><pre><code>&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n  &lt;body&gt;\n    &lt;h1&gt;Hello, HTML!&lt;/h1&gt;\n  &lt;/body&gt;\n&lt;/html&gt;</code></pre><h3>Sample Program:</h3><pre><code>&lt;article&gt;\n  &lt;header&gt;&lt;h2&gt;Tech Article&lt;/h2&gt;&lt;/header&gt;\n  &lt;p&gt;Semantic HTML example with article and header tags.&lt;/p&gt;\n&lt;/article&gt;</code></pre>`,
+        image: 'https://picsum.photos/seed/html-semantics/600/400',
+        tags: ['HTML', 'Semantics', 'Accessibility']
+      },
+      {
+        id: 12,
+        title: 'Modern CSS',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'CSS styles HTML elements with layouts, colors, and responsiveness.',
+        content: `<p><strong>Explanation:</strong> CSS styles HTML elements by applying colors, layouts, animations, and responsiveness.</p><p><strong>Uses:</strong> Layout design, theming, transitions, responsive UI for web and mobile.</p><h3>Basic Program:</h3><pre><code>h1 {\n  color: blue;\n}</code></pre><h3>Sample Program:</h3><pre><code>.container {\n  display: flex;\n  justify-content: center;\n  padding: 20px;\n}</code></pre>`,
+        image: 'https://picsum.photos/seed/modern-css/600/400',
+        tags: ['CSS', 'Styling', 'Responsive Design']
+      },
+      {
+        id: 13,
+        title: 'JavaScript ES6 and Beyond',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'ES6 introduced arrow functions, promises, classes, and modules to modern JavaScript.',
+        content: `<p><strong>Explanation:</strong> JavaScript is a scripting language used to create dynamic content on web pages. ES6 introduced features like arrow functions, promises, classes, and modules.</p><p><strong>Uses:</strong> Client-side interactivity, server-side logic (Node.js), mobile and desktop apps (React Native, Electron).</p><h3>Basic Program:</h3><pre><code>console.log("Hello, JavaScript!");</code></pre><h3>Sample Program:</h3><pre><code>const greet = (name) => \`Hello, \${name}!\`;\nconsole.log(greet("Techie"));</code></pre>`,
+        image: 'https://picsum.photos/seed/javascript-es6/600/400',
+        tags: ['JavaScript', 'ES6', 'Frontend']
+      },
+      {
+        id: 14,
+        title: 'Python for Problem Solving',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'Python is known for its simplicity and versatility, used in web, AI, and automation.',
+        content: `<p><strong>Explanation:</strong> Python is a high-level, interpreted programming language known for its simplicity and versatility.</p><p><strong>Uses:</strong> Web development, data science, AI/ML, scripting, automation.</p><h3>Basic Program:</h3><pre><code>print("Hello, Python!")</code></pre><h3>Sample Program:</h3><pre><code>def factorial(n):\n    return 1 if n == 0 else n * factorial(n - 1)\n\nprint("Factorial of 5 is", factorial(5))</code></pre>`,
+        image: 'https://picsum.photos/seed/python-code/600/400',
+        tags: ['Python', 'Problem Solving', 'AI']
+      },
+      {
+        id: 15,
+        title: 'Java OOP Essentials',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'Java is a robust object-oriented language used for cross-platform development.',
+        content: `<p><strong>Explanation:</strong> Java is a class-based object-oriented programming language designed for cross-platform compatibility.</p><p><strong>Uses:</strong> Android apps, enterprise software, backend systems.</p><h3>Basic Program:</h3><pre><code>public class HelloWorld {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}</code></pre><h3>Sample Program:</h3><pre><code>class Person {\n  String name = "Alex";\n  void greet() {\n    System.out.println("Hello " + name);\n  }\n}</code></pre>`,
+        image: 'https://picsum.photos/seed/java-oop/600/400',
+        tags: ['Java', 'OOP', 'Backend']
+      },
+      {
+        id: 16,
+        title: 'C Language Basics',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'C is a procedural programming language used for systems and embedded development.',
+        content: `<p><strong>Explanation:</strong> C is a procedural programming language often used for system-level programming.</p><p><strong>Uses:</strong> Operating systems, embedded systems, compilers.</p><h3>Basic Program:</h3><pre><code>#include &lt;stdio.h&gt;\nint main() {\n  printf("Hello, C!");\n  return 0;\n}</code></pre><h3>Sample Program:</h3><pre><code>int sum(int a, int b) {\n  return a + b;\n}</code></pre>`,
+        image: 'https://picsum.photos/seed/c-language/600/400',
+        tags: ['C', 'System Programming']
+      },
+      {
+        id: 17,
+        title: 'Getting Started with C++ STL',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'C++ STL provides powerful tools for efficient and fast coding.',
+        content: `<p><strong>Explanation:</strong> C++ builds on C and includes object-oriented features and the Standard Template Library (STL).</p><p><strong>Uses:</strong> Game development, competitive programming, system-level apps.</p><h3>Basic Program:</h3><pre><code>#include &lt;iostream&gt;\nusing namespace std;\nint main() {\n  cout &lt;&lt; "Hello, C++!";\n  return 0;\n}</code></pre><h3>Sample Program:</h3><pre><code>#include &lt;vector&gt;\nvector&lt;int&gt; nums = {1, 2, 3};</code></pre>`,
+        image: 'https://picsum.photos/seed/cpp-stl/600/400',
+        tags: ['C++', 'STL', 'Programming']
+      },
+      {
+        id: 18,
+        title: 'UI/UX Design Best Practices',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'UI is about looks; UX is about how it works. Learn best practices in design.',
+        content: `<p><strong>Explanation:</strong> UI refers to the visual elements. UX is the overall user experience.</p><p><strong>Uses:</strong> Web design, wireframing, accessibility design.</p><h3>Basic Principle:</h3><pre><code>- Use consistent spacing and colors\n- Prioritize readability\n- Make interactive elements clear</code></pre><h3>Sample Techniques:</h3><pre><code>- Wireframes before design\n- Responsive grids\n- Figma/Adobe XD for prototyping</code></pre>`,
+        image: 'https://picsum.photos/seed/uiux-design/600/400',
+        tags: ['UI', 'UX', 'Design']
+      },
+      {
+        id: 19,
+        title: 'DevOps Workflow Essentials',
+        author: 'Tech Blogs',
+        date: '2025-06-25',
+        excerpt: 'DevOps integrates development and IT operations with automation and CI/CD.',
+        content: `<p><strong>Explanation:</strong> DevOps integrates development and IT operations to deliver software continuously.</p><p><strong>Uses:</strong> CI/CD, automation, cloud deployments.</p><h3>Basic Tools:</h3><pre><code>- Git\n- Jenkins\n- Docker</code></pre><h3>Sample Flow:</h3><pre><code>Developer → Git Commit → CI Pipeline → Docker Build → Deploy to Cloud</code></pre>`,
+        image: 'https://picsum.photos/seed/devops/600/400',
+        tags: ['DevOps', 'CI/CD', 'Automation']
+      }
+    ];
+
+    let currentPage = 'home';
+    let selectedPostId = null;
+
+    const appContent = document.getElementById('app-content');
+    const navHomeBtn = document.getElementById('nav-home');
+    const navBlogBtn = document.getElementById('nav-blog');
+    const navAboutBtn = document.getElementById('nav-about');
+    const brandLogo = document.getElementById('brand-logo');
+    const globalMessageDiv = document.getElementById('global-message');
+
+    function showGlobalMessage(text, type = 'success') {
+      globalMessageDiv.textContent = text;
+      globalMessageDiv.style.display = 'block';
+      globalMessageDiv.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500');
+      globalMessageDiv.classList.add('opacity-0', 'scale-95');
+      if (type === 'success') {
+        globalMessageDiv.classList.add('bg-green-500');
+      } else if (type === 'error') {
+        globalMessageDiv.classList.add('bg-red-500');
+      } else {
+        globalMessageDiv.classList.add('bg-blue-500');
+      }
+      setTimeout(() => {
+        globalMessageDiv.classList.remove('opacity-0', 'scale-95');
+        globalMessageDiv.classList.add('opacity-100', 'scale-100');
+      }, 50);
+      setTimeout(() => {
+        globalMessageDiv.classList.remove('opacity-100', 'scale-100');
+        globalMessageDiv.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          globalMessageDiv.style.display = 'none';
+        }, 300);
+      }, 3000);
+    }
+
+    function navigateTo(page, postId = null) {
+      currentPage = page;
+      selectedPostId = postId;
+      renderCurrentPage();
+      window.scrollTo(0, 0);
+    }
+
+    function getBlogPostCardHtml(post) {
+      return `
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-102 hover:shadow-2xl flex flex-col animate-fade-in-up">
+          <img src="${post.image}" alt="${post.title}" class="w-full h-52 object-cover" loading="lazy"
+          onerror="this.onerror=null;this.src='https://placehold.co/600x400/CCCCCC/000000?text=No+Image';">
+          <div class="p-6 flex flex-col flex-grow">
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">${post.title}</h3>
+            <p class="text-sm text-gray-500 mb-4">By <span class="font-semibold text-violet-700">${post.author}</span> on ${post.date}</p>
+            <p class="text-gray-700 leading-relaxed text-base mb-6 flex-grow">${post.excerpt}</p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              ${post.tags.map(tag => `<span class="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">${tag}</span>`).join('')}
+            </div>
+            <button data-id="${post.id}" class="read-more-btn mt-auto bg-violet-600 text-white py-3 px-6 rounded-lg hover:bg-violet-700 transition-colors duration-300 shadow-md font-semibold text-lg">Read More →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBlogListPage() {
+      appContent.innerHTML = `
+        <h2 class="text-4xl font-extrabold text-gray-800 mb-8 text-center animate-fade-in-up">Latest Insights</h2>
+        <div id="blog-post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+      `;
+      const blogPostGrid = document.getElementById('blog-post-grid');
+      blogPosts.forEach(post => {
+        blogPostGrid.insertAdjacentHTML('beforeend', getBlogPostCardHtml(post));
+      });
+      blogPostGrid.addEventListener('click', event => {
+        if (event.target.classList.contains('read-more-btn')) {
+          const postId = parseInt(event.target.dataset.id);
+          navigateTo('singlePost', postId);
+        }
+      });
+    }
+
+    function renderSinglePostPage(postId) {
+      const post = blogPosts.find(p => p.id === postId);
+      if (!post) {
+        appContent.innerHTML = `
+          <div class="text-center text-red-500 text-2xl py-20 animate-fade-in-up">
+            Oops! Blog post not found.<br><br>
+            <button id="back-to-blog-btn" class="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md text-lg font-semibold mt-4">
+              Back to Blog
+            </button>
+          </div>
+        `;
+        document.getElementById('back-to-blog-btn').addEventListener('click', () => navigateTo('blogList'));
+        showGlobalMessage('Blog post not found.', 'error');
+        return;
+      }
+      appContent.innerHTML = `
+        <article class="bg-white rounded-xl shadow-xl p-8 lg:p-10 max-w-4xl mx-auto animate-fade-in-up">
+          <img src="${post.image}" alt="${post.title}" class="w-full h-80 object-cover rounded-lg mb-8"
+          onerror="this.onerror=null;this.src='https://placehold.co/800x400/CCCCCC/000000?text=No+Image';">
+          <h1 class="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-4">${post.title}</h1>
+          <p class="text-lg text-gray-600 mb-6">By <span class="font-bold text-violet-700">${post.author}</span> on <time datetime="${post.date}">${post.date}</time></p>
+          <div class="prose max-w-none text-gray-700 text-lg leading-relaxed mb-8">${post.content}</div>
+          <div class="flex flex-wrap gap-3 mb-8">
+            ${post.tags.map(tag => `<span class="bg-violet-100 text-violet-700 text-sm font-semibold px-3 py-1 rounded-full shadow-sm">${tag}</span>`).join('')}
+          </div>
+          <button id="back-to-blog-list-btn" class="bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors duration-300 shadow-md font-semibold text-lg">← Back to All Posts</button>
+        </article>
+      `;
+      document.getElementById('back-to-blog-list-btn').addEventListener('click', () => navigateTo('blogList'));
+    }
+
+    function renderHomePage() {
+      appContent.innerHTML = `
+        <div class="text-center py-20 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl shadow-xl text-white animate-fade-in-up">
+          <h1 class="text-5xl lg:text-6xl font-extrabold mb-4">Welcome to The Tech Blog!</h1>
+          <p class="text-xl lg:text-2xl font-light mb-8 opacity-90">Your go-to source for cutting-edge web development insights.</p>
+          <button id="explore-blog-btn" class="bg-white text-violet-700 py-4 px-8 rounded-full text-xl font-bold hover:bg-violet-100 hover:text-violet-800 transition-all duration-300 shadow-lg transform hover:scale-105">Explore Our Blog →</button>
+        </div>
+      `;
+      document.getElementById('explore-blog-btn').addEventListener('click', () => navigateTo('blogList'));
+    }
+
+    function renderAboutPage() {
+      appContent.innerHTML = `
+        <div class="bg-white rounded-xl shadow-xl p-8 lg:p-10 max-w-3xl mx-auto text-center animate-fade-in-up">
+          <h2 class="text-4xl font-extrabold text-gray-900 mb-6">About The Tech Blog</h2>
+          <img src="https://picsum.photos/seed/about-us-team-coding/800/400" alt="About Us" class="w-full h-64 object-cover rounded-lg mb-8 shadow-md" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/800x400/CCCCCC/000000?text=About+Us';">
+          <p class="text-lg text-gray-700 leading-relaxed mb-6">The Tech Blog is a passion project for sharing actionable web development knowledge. We empower developers with practical tutorials, clean UI principles, and modern performance tips.</p>
+          <p class="text-lg text-gray-700 leading-relaxed">From HTML to DevOps, we cover the full spectrum of frontend and backend engineering. Join us on a journey to craft the modern web!</p>
+        </div>
+      `;
+    }
+
+    function renderCurrentPage() {
+      appContent.innerHTML = '';
+      switch (currentPage) {
+        case 'home': renderHomePage(); break;
+        case 'blogList': renderBlogListPage(); break;
+        case 'singlePost': renderSinglePostPage(selectedPostId); break;
+        case 'about': renderAboutPage(); break;
+        default: renderHomePage(); break;
+      }
+    }
+
+    navHomeBtn.addEventListener('click', () => navigateTo('home'));
+    navBlogBtn.addEventListener('click', () => navigateTo('blogList'));
+    navAboutBtn.addEventListener('click', () => navigateTo('about'));
+    brandLogo.addEventListener('click', () => navigateTo('home'));
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+      renderCurrentPage();
+    });
+
+  </script>
+</body>
+</html>
